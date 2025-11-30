@@ -1,0 +1,86 @@
+---
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  test-default:
+    name: Test with default settings
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Amber
+        uses: ./
+        with:
+          amber-version: 0.4.0-alpha
+
+      - name: Verify Amber installation
+        run: |
+          which amber
+          amber --version
+
+      - name: Test Amber compilation
+        run: |
+          echo 'echo "Hello from Amber!"' > test.ab
+          amber test.ab
+          bash test.sh
+
+  test-custom-version:
+    name: Test with custom version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Amber 0.5.0-alpha
+        uses: ./
+        with:
+          amber-version: 0.5.0-alpha
+
+      - name: Verify installation
+        run: |
+          amber --version
+
+  test-cache-disabled:
+    name: Test with cache disabled
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Amber without cache
+        uses: ./
+        with:
+          amber-version: 0.4.0-alpha
+          enable-cache: false
+
+      - name: Verify installation
+        run: amber --version
+
+  test-custom-cache-path:
+    name: Test with custom cache path
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Amber with custom cache
+        uses: ./
+        with:
+          amber-version: 0.4.0-alpha
+          cache-path: /tmp/amber-test-cache
+
+      - name: Verify installation
+        run: amber --version
