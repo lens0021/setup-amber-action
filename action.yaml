@@ -1,0 +1,123 @@
+name: Setup Amber
+description: Download an Amber compiler.
+branding:
+  color: orange
+  icon: download
+inputs:
+  amber-version:
+    default: 0.4.0-alpha
+  enable-cache:
+    description: Whether to cache Amber binaries.
+    default: true
+  cache-path:
+    description: >-
+      The path to store Amber binaries.
+      If empty string is given, the used path depends on the runner.
+    default: ""
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        # Export cache path
+        if [ -n "${{ inputs.cache-path }}" ]; then
+          echo -n 'amber_cache_path=${{ inputs.cache-path }}' >> "$GITHUB_ENV"
+        elif [ "${{ runner.os }}" == "Linux" ]; then
+          echo -n 'amber_cache_path=/home/runner/.setup-amber' >> "$GITHUB_ENV"
+        else
+          echo -n 'amber_cache_path=/Users/runner/.setup-amber' >> "$GITHUB_ENV"
+        fi
+    - name: Cache Amber binaries
+      uses: actions/cache@v4
+      if: inputs.enable-cache
+      with:
+        path: ${{ env.amber_cache_path }}/bin
+        key: setup-amber-${{ runner.os }}-${{ inputs.amber-version }}
+    - name: Download Amber binary
+      uses: lens0021/amber-script-action@v1
+      with:
+        amber-version: 0.4.0-alpha
+        script: |
+          import { env_var_get } from "std/env"
+          import { dir_create, file_chmod, file_exists, file_extract } from "std/fs"
+
+          /// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
+          fun get_os(): Text {
+            const os_type = $ uname -s $ failed {
+                echo "Failed to determine OS type (using `uname` command)."
+                exit 1
+            }
+            if os_type == "Darwin":
+                return "macos"
+
+            if os_type != "Linux" {
+                echo "Unsupported OS type: {os_type}"
+                exit 1
+            }
+
+            if not has_failed("ls -l /lib | grep libc.musl"):
+                return "linux-musl"
+
+            return "linux-gnu"
+          }
+
+          /// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
+          fun get_arch(): Text {
+            let arch_type = $ uname -m $ failed {
+              echo "Failed to determine architecture."
+              exit 1
+            }
+
+            let arch = array_contains(["arm64", "aarch64"], arch_type)
+              then "aarch64"
+              else "x86_64"
+
+            return arch
+          }
+
+          const cache_path = env_var_get("AMBER_CACHE_PATH")
+
+          const ver = env_var_get("AMBER_VERSION")
+          const os = get_os()
+          const arch = get_arch()
+          let filename = "amber"
+          if {
+            ver == "0.4.0-alpha":
+              // - amber-aarch64-apple-darwin.tar.xz
+              // - amber-aarch64-unknown-linux-gnu.tar.xz
+              // - amber-x86_64-apple-darwin.tar.xz
+              // - amber-x86_64-pc-windows-msvc.zip
+              // - amber-x86_64-unknown-linux-gnu.tar.xz
+              // - amber-x86_64-unknown-linux-musl.tar.xz
+              // - amber-amd64.deb
+              filename += "-{arch}"
+              if os == "linux-gnu" or os =="linux-musl":
+                filename += "-unknown-{os}"
+              else:
+                filename += "-apple-darwin"
+            ver == "0.5.0-alpha":
+              // - amber-linux-gnu-aarch64.tar.xz
+              // - amber-linux-gnu-x86_64.tar.xz
+              // - amber-linux-musl-aarch64.tar.xz
+              // - amber-linux-musl-x86_64.tar.xz
+              // - amber-macos-aarch64.tar.xz
+              // - amber-macos-x86_64.tar.xz
+              // - amber-windows-x86_64.tar.xz 
+              // - amber-linux-debian-x86_64.deb
+              filename += "-{os}"
+              filename += "-{arch}"
+            else:
+              echo "The version {ver} is currently not supported."
+              exit 1
+          }
+          const url = "https://github.com/amber-lang/amber/releases/download/{ver}/{filename}.tar.xz"
+          const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
+          file_download(url, "{temp_dir}/amber.tar.xz")
+          trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
+          $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
+            echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+            exit 1
+          }
+      env:
+        AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
+        AMBER_VERSION: ${{ inputs.amber-version }}
