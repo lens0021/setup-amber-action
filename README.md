@@ -1,6 +1,7 @@
 # setup-amber
 
 [![Linter](https://github.com/lens0021/setup-amber/actions/workflows/linter.yaml/badge.svg)](https://github.com/lens0021/setup-amber/actions/workflows/linter.yaml)
+[![Test](https://github.com/lens0021/setup-amber/actions/workflows/test.yaml/badge.svg)](https://github.com/lens0021/setup-amber/actions/workflows/test.yaml)
 
 GitHub Actions for setting up [Amber] compiler.
 
