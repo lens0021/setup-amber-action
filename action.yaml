@@ -45,7 +45,7 @@ runs:
         path: ${{ env.amber_cache_path }}/bin
         key: setup-amber-${{ runner.os }}-${{ inputs.amber-version }}
     - name: Download Amber binary
-      uses: lens0021/amber-script-action@36d8f95c6c8b5b72868233c02a88d5eee7a5cf24
+      uses: lens0021/amber-script-action@399666c8628d128fe83ec1378ebfedb8355328f0
       with:
         amber-version: 0.5.0-alpha
         script: |
