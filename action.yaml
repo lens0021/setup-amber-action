@@ -41,7 +41,7 @@ runs:
       with:
         amber-version: 0.4.0-alpha
         script: |
-          import { env_var_get } from "std/env"
+          import { env_var_get, has_failed } from "std/env"
           import { dir_create, file_chmod, file_exists, file_extract } from "std/fs"
 
           /// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
