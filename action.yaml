@@ -1,4 +1,4 @@
-name: Setup Amber
+name: Setup Amber Compiler
 description: Download an Amber compiler.
 branding:
   color: orange
