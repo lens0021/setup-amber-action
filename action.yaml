@@ -130,9 +130,19 @@ runs:
           const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
           trust file_download(url, "{temp_dir}/amber.tar.xz")
           trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
-          $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
-            echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
-            exit 1
+          if {
+            ver == "0.4.0-alpha" {
+              $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
+                echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                exit 1
+              }
+            }
+            ver == "0.5.0-alpha" {
+              $ install "{temp_dir}/amber" /usr/local/bin/amber $ failed(code) {
+                echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                exit 1
+              }
+            }
           }
       env:
         AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
