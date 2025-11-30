@@ -49,8 +49,10 @@ runs:
       with:
         amber-version: 0.4.0-alpha
         script: |
+          import { array_contains } from "std/array"
           import { env_var_get, has_failed } from "std/env"
-          import { dir_create, file_chmod, file_exists, file_extract } from "std/fs"
+          import { dir_create, temp_dir_create, file_extract } from "std/fs"
+          import { file_download } from "std/http"
 
           /// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
           fun get_os(): Text {
@@ -93,7 +95,7 @@ runs:
           const arch = get_arch()
           let filename = "amber"
           if {
-            ver == "0.4.0-alpha":
+            ver == "0.4.0-alpha" {
               // - amber-aarch64-apple-darwin.tar.xz
               // - amber-aarch64-unknown-linux-gnu.tar.xz
               // - amber-x86_64-apple-darwin.tar.xz
@@ -106,7 +108,8 @@ runs:
                 filename += "-unknown-{os}"
               else:
                 filename += "-apple-darwin"
-            ver == "0.5.0-alpha":
+            }
+            ver == "0.5.0-alpha" {
               // - amber-linux-gnu-aarch64.tar.xz
               // - amber-linux-gnu-x86_64.tar.xz
               // - amber-linux-musl-aarch64.tar.xz
@@ -117,13 +120,15 @@ runs:
               // - amber-linux-debian-x86_64.deb
               filename += "-{os}"
               filename += "-{arch}"
-            else:
+            }
+            else {
               echo "The version {ver} is currently not supported."
               exit 1
+            }
           }
           const url = "https://github.com/amber-lang/amber/releases/download/{ver}/{filename}.tar.xz"
           const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
-          file_download(url, "{temp_dir}/amber.tar.xz")
+          trust file_download(url, "{temp_dir}/amber.tar.xz")
           trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
           $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
             echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
