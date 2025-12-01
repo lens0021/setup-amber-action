@@ -11,7 +11,7 @@ inputs:
     default: true
   cache-path:
     description: >-
-      The path to store Amber binaries.
+      The path to directory where Amber binary caches are stored.
       If empty string is given, the used path depends on the runner.
     default: ""
 runs:
@@ -43,7 +43,7 @@ runs:
       if: inputs.enable-cache
       with:
         path: ${{ env.amber_cache_path }}/bin
-        key: setup-amber-${{ runner.os }}-${{ inputs.amber-version }}
+        key: setup-amber-${{ runner.os }}-${{ runner.arch }}-${{ inputs.amber-version }}
     - name: Download Amber binary
       uses: lens0021/amber-script-action@31ab14026ac16a3d93bc20767087084ce5344517 # v1.1.1
       with:
@@ -51,7 +51,7 @@ runs:
         script: |
           import { array_contains } from "std/array"
           import { env_var_get, has_failed } from "std/env"
-          import { dir_create, temp_dir_create, file_extract } from "std/fs"
+          import { dir_create, file_exists, file_extract, temp_dir_create } from "std/fs"
           import { file_download } from "std/http"
 
           /// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
@@ -89,58 +89,72 @@ runs:
           }
 
           const cache_path = trust env_var_get("AMBER_CACHE_PATH")
-
-          const ver = trust env_var_get("AMBER_VERSION")
-          const os = get_os()
-          const arch = get_arch()
-          let filename = "amber"
-          if {
-            ver == "0.4.0-alpha" {
-              // - amber-aarch64-apple-darwin.tar.xz
-              // - amber-aarch64-unknown-linux-gnu.tar.xz
-              // - amber-x86_64-apple-darwin.tar.xz
-              // - amber-x86_64-pc-windows-msvc.zip
-              // - amber-x86_64-unknown-linux-gnu.tar.xz
-              // - amber-x86_64-unknown-linux-musl.tar.xz
-              // - amber-amd64.deb
-              filename += "-{arch}"
-              if os == "linux-gnu" or os =="linux-musl":
-                filename += "-unknown-{os}"
-              else:
-                filename += "-apple-darwin"
-            }
-            ver == "0.5.0-alpha" {
-              // - amber-linux-gnu-aarch64.tar.xz
-              // - amber-linux-gnu-x86_64.tar.xz
-              // - amber-linux-musl-aarch64.tar.xz
-              // - amber-linux-musl-x86_64.tar.xz
-              // - amber-macos-aarch64.tar.xz
-              // - amber-macos-x86_64.tar.xz
-              // - amber-windows-x86_64.tar.xz 
-              // - amber-linux-debian-x86_64.deb
-              filename += "-{os}"
-              filename += "-{arch}"
-            }
-            else {
-              echo "The version {ver} is currently not supported."
+          if file_exists("{cache_path}/bin/amber") {
+            $ install "{cache_path}/bin/amber" /usr/local/bin/amber $ failed(code) {
+              echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
               exit 1
             }
-          }
-          const url = "https://github.com/amber-lang/amber/releases/download/{ver}/{filename}.tar.xz"
-          const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
-          trust file_download(url, "{temp_dir}/amber.tar.xz")
-          trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
-          if {
-            ver == "0.4.0-alpha" {
-              $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
-                echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+          } else {
+            trust dir_create("{cache_path}/bin")
+
+            const ver = trust env_var_get("AMBER_VERSION")
+            const os = get_os()
+            const arch = get_arch()
+            let filename = "amber"
+            if {
+              ver == "0.4.0-alpha" {
+                // - amber-aarch64-apple-darwin.tar.xz
+                // - amber-aarch64-unknown-linux-gnu.tar.xz
+                // - amber-x86_64-apple-darwin.tar.xz
+                // - amber-x86_64-pc-windows-msvc.zip
+                // - amber-x86_64-unknown-linux-gnu.tar.xz
+                // - amber-x86_64-unknown-linux-musl.tar.xz
+                // - amber-amd64.deb
+                filename += "-{arch}"
+                if os == "linux-gnu" or os =="linux-musl":
+                  filename += "-unknown-{os}"
+                else:
+                  filename += "-apple-darwin"
+              }
+              ver == "0.5.0-alpha" {
+                // - amber-linux-gnu-aarch64.tar.xz
+                // - amber-linux-gnu-x86_64.tar.xz
+                // - amber-linux-musl-aarch64.tar.xz
+                // - amber-linux-musl-x86_64.tar.xz
+                // - amber-macos-aarch64.tar.xz
+                // - amber-macos-x86_64.tar.xz
+                // - amber-windows-x86_64.tar.xz 
+                // - amber-linux-debian-x86_64.deb
+                filename += "-{os}"
+                filename += "-{arch}"
+              }
+              else {
+                echo "The version {ver} is currently not supported."
                 exit 1
               }
             }
-            ver == "0.5.0-alpha" {
-              $ install "{temp_dir}/amber" /usr/local/bin/amber $ failed(code) {
-                echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
-                exit 1
+            const url = "https://github.com/amber-lang/amber/releases/download/{ver}/{filename}.tar.xz"
+            const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
+            trust file_download(url, "{temp_dir}/amber.tar.xz")
+            trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
+            if {
+              ver == "0.4.0-alpha" {
+                $ cp "{temp_dir}/{filename}/amber" "{cache_path}/bin" $ failed(code) {
+                  echo "Failed to locate binary file to {cache_path}/bin with code {code}."
+                }
+                $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
+                  echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                  exit 1
+                }
+              }
+              ver == "0.5.0-alpha" {
+                $ cp "{temp_dir}/amber" "{cache_path}/bin" $ failed(code) {
+                  echo "Failed to locate binary file to {cache_path}/bin with code {code}."
+                }
+                $ install "{temp_dir}/amber" /usr/local/bin/amber $ failed(code) {
+                  echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                  exit 1
+                }
               }
             }
           }
