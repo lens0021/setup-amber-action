@@ -5,6 +5,7 @@ branding:
   icon: download
 inputs:
   amber-version:
+    description: The version of Amber to install.
     default: 0.4.0-alpha
   enable-cache:
     description: Whether to cache Amber binaries.
