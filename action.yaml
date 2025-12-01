@@ -15,6 +15,11 @@ inputs:
       The path to directory where Amber binary caches are stored.
       If empty string is given, the used path depends on the runner.
     default: ""
+  bin-path:
+    description: >-
+      The path to location where the final amber binary should be located.
+      Default to `/usr/local/bin/amber`.
+    default: /usr/local/bin/amber
 runs:
   using: composite
   steps:
@@ -49,6 +54,7 @@ runs:
       uses: lens0021/amber-script-action@31ab14026ac16a3d93bc20767087084ce5344517 # v1.1.1
       env:
         AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
+        AMBER_BIN_PATH: ${{ inputs.bin-path }}
         AMBER_VERSION: ${{ inputs.amber-version }}
       with:
         amber-version: 0.5.0-alpha
@@ -93,9 +99,10 @@ runs:
           }
 
           const cache_path = trust env_var_get("AMBER_CACHE_PATH")
+          const bin_path = trust env_var_get("AMBER_BIN_PATH")
           if file_exists("{cache_path}/bin/amber") {
-            $ install "{cache_path}/bin/amber" /usr/local/bin/amber $ failed(code) {
-              echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+            $ install "{cache_path}/bin/amber" "{bin_path}" $ failed(code) {
+              echo "Failed to locate binary file to {bin_path} with code {code}."
               exit 1
             }
           } else {
@@ -146,8 +153,8 @@ runs:
                 $ cp "{temp_dir}/{filename}/amber" "{cache_path}/bin" $ failed(code) {
                   echo "Failed to locate binary file to {cache_path}/bin with code {code}."
                 }
-                $ install "{temp_dir}/{filename}/amber" /usr/local/bin/amber $ failed(code) {
-                  echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                $ install "{temp_dir}/{filename}/amber" "{bin_path}" $ failed(code) {
+                  echo "Failed to locate binary file to {bin_path} with code {code}."
                   exit 1
                 }
               }
@@ -155,8 +162,8 @@ runs:
                 $ cp "{temp_dir}/amber" "{cache_path}/bin" $ failed(code) {
                   echo "Failed to locate binary file to {cache_path}/bin with code {code}."
                 }
-                $ install "{temp_dir}/amber" /usr/local/bin/amber $ failed(code) {
-                  echo "Failed to locate binary file to /usr/local/bin/amber with code {code}."
+                $ install "{temp_dir}/amber" "{bin_path}" $ failed(code) {
+                  echo "Failed to locate binary file to {bin_path} with code {code}."
                   exit 1
                 }
               }
