@@ -9,7 +9,7 @@
 * new input 'bin-path' for customize target path of binary ([#16](https://github.com/lens0021/setup-amber-action/issues/16)) ([ddef526](https://github.com/lens0021/setup-amber-action/commit/ddef526b08e0907c3070af368a36747e85342a4c))
 
 
-### Bug Fixes
+### Bugfixes
 
 * Add packages configuration to release-please ([#12](https://github.com/lens0021/setup-amber-action/issues/12)) ([4ee3d3c](https://github.com/lens0021/setup-amber-action/commit/4ee3d3c96aa5cb9f980b2717608bd789930001ed))
 * Reset release-please manifest to bootstrap ([#8](https://github.com/lens0021/setup-amber-action/issues/8)) ([853e74c](https://github.com/lens0021/setup-amber-action/commit/853e74cd5273af97edab3a4ca56a6185370709e6))
