@@ -3,7 +3,8 @@
 	"packages": {
 		".": {
 			"release-type": "simple",
-			"include-component-in-tag": false
+			"include-component-in-tag": false,
+			"changelog_sections": [{ "type": "fix", "section": "Bugfixes" }]
 		}
 	}
 }
