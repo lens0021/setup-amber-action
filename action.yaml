@@ -112,12 +112,16 @@ runs:
               else 0
 
             // Compare with 0.5.0
-            if major < 0 {
-              return true
-            } else if major > 0 {
-              return false
-            } else {
-              return minor < 5
+            if {
+              major < 0 {
+                return true
+              }
+              major > 0 {
+                return false
+              }
+              else {
+                return minor < 5
+              }
             }
           }
 
