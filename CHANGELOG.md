@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/lens0021/setup-amber-action/compare/v1.1.0...v1.2.0) (2025-12-02)
+
+
+### Features
+
+* Support all Amber versions with improved validation ([#20](https://github.com/lens0021/setup-amber-action/issues/20)) ([b3758ae](https://github.com/lens0021/setup-amber-action/commit/b3758aea5e1bab06cdc14a5b356f266fcad869c6))
+
 ## [1.1.0](https://github.com/lens0021/setup-amber-action/compare/v1.0.0...v1.1.0) (2025-12-01)
 
 
