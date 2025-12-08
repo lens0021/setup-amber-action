@@ -28,7 +28,8 @@ runs:
         INPUT_CACHE_PATH: ${{ inputs.cache-path }}
         RUNNER_OS: ${{ runner.os }}
       run: |
-        # Export cache path using delimiter syntax to prevent injection
+        # Export cache path
+        # using delimiter syntax to prevent injection
         delimiter="ghadelimiter_$(openssl rand -hex 16)"
 
         if [ -n "$INPUT_CACHE_PATH" ]; then
