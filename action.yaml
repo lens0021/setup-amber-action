@@ -136,14 +136,16 @@ runs:
           const cache_path = trust env_var_get("SETUP_AMBER_CACHE_PATH")
           const bin_path = trust env_var_get("SETUP_AMBER_BIN_PATH")
           if file_exists("{cache_path}/bin/amber") {
+            echo "::debug::Using cached amber binary"
             $ install "{cache_path}/bin/amber" "{bin_path}" $ failed(code) {
               echo "Failed to locate binary file to {bin_path} with code {code}."
               exit 1
             }
           } else {
+            const ver = trust env_var_get("SETUP_AMBER_VERSION")
+            echo "::debug::Downloading amber {ver}"
             trust dir_create("{cache_path}/bin")
 
-            const ver = trust env_var_get("SETUP_AMBER_VERSION")
             const os = get_os()
             const arch = get_arch()
 
@@ -184,6 +186,7 @@ runs:
               exit 1
             }
 
+            echo "::debug::Downloading from {url}"
             const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
             trust file_download(url, "{temp_dir}/amber.tar.xz")
             trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
@@ -193,6 +196,7 @@ runs:
               then "{temp_dir}/{filename}/amber"
               else "{temp_dir}/amber"
 
+            echo "::debug::Installing binary from {binary_source}"
             $ cp "{binary_source}" "{cache_path}/bin" $ failed(code) {
               echo "Failed to copy binary file to {cache_path}/bin with code {code}."
             }
@@ -200,4 +204,5 @@ runs:
               echo "Failed to install binary file to {bin_path} with code {code}."
               exit 1
             }
+            echo "::debug::Successfully installed amber {ver} to {bin_path}"
           }
