@@ -58,7 +58,7 @@ runs:
         SETUP_AMBER_BIN_PATH: ${{ inputs.bin-path }}
         SETUP_AMBER_VERSION: ${{ inputs.amber-version }}
       with:
-        amber-version: 0.5.0-alpha
+        amber-version: 0.5.1-alpha
         script: |
           import { array_contains } from "std/array"
           import { env_var_get, has_failed } from "std/env"
