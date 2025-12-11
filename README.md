@@ -72,4 +72,3 @@ jobs:
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 [amber]: https://amber-lang.com/
-[composite action]: https://docs.github.com/en/actions/sharing-automations/creating-actions/creating-a-composite-action
