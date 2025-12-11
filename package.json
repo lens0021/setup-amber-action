@@ -1,0 +1,45 @@
+{
+	"name": "checkout",
+	"version": "2.0.0",
+	"description": "Download amber compiler",
+	"main": "lib/main.js",
+	"scripts": {
+		"build": "tsc && ncc build",
+		"format": "biome format --write '**/*.ts'",
+		"check": "biome check '**/*.ts'",
+		"lint": "biome lint src/**/*.ts",
+		"test": "jest"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/lens0021/setup-amber-action.git"
+	},
+	"keywords": [
+		"github",
+		"actions",
+		"amber"
+	],
+	"author": "lens0021",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/lens0021/setup-amber-action/issues"
+	},
+	"homepage": "https://github.com/lens0021/setup-amber-action#readme",
+	"dependencies": {
+		"@actions/core": "^1.10.1",
+		"@actions/http-client": "^3.0.0",
+		"@actions/io": "^1.1.3",
+		"@actions/tool-cache": "^2.0.1"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.12",
+		"@types/node": "^24.1.0",
+		"@vercel/ncc": "^0.38.1",
+		"biome": "^0.3.3",
+		"jest": "^29.7.0",
+		"jest-circus": "^29.7.0",
+		"js-yaml": "^4.1.0",
+		"ts-jest": "^29.2.5",
+		"typescript": "^5.5.4"
+	}
+}
