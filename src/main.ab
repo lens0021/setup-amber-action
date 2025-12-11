@@ -70,7 +70,7 @@ fun check_url_exists(url: Text): Bool {
   const retry_delay_seconds = 1
 
   for attempt in 1..max_retries+1 {
-    silent $ curl --head --fail --silent "{url}" $ exited(code) {
+    silent $ curl --head --fail --silent --location "{url}" $ exited(code) {
       if code == 0 {
         return true
       }

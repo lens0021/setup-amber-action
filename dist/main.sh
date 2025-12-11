@@ -557,7 +557,7 @@ check_url_exists__167_v0() {
     from=1
     to="$(( ${max_retries_23} + 1 ))"
     for attempt_25 in $(if [ "${from}" -gt "${to}" ]; then seq -- "${from}" -1 "$(( ${to} + 1 ))"; elif [ "${from}" -lt "${to}" ]; then seq -- "${from}" "$(( ${to} - 1 ))"; fi); do
-        curl --head --fail --silent "${url}" >/dev/null 2>&1
+        curl --head --fail --silent --location "${url}" >/dev/null 2>&1
         __status=$?
         code_26="${__status}"
             if [ "$(( ${code_26} == 0 ))" != 0 ]; then
