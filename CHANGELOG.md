@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/lens0021/setup-amber-action/compare/v2.0.0...v2.1.0) (2025-12-11)
+
+
+### Features
+
+* Revert action implementation to composite action ([#39](https://github.com/lens0021/setup-amber-action/issues/39)) ([393f604](https://github.com/lens0021/setup-amber-action/commit/393f604d778d2d537c6c0bcf05f16b3c3403a057))
+
 ## [2.0.0](https://github.com/lens0021/setup-amber-action/compare/v1.2.0...v2.0.0) (2025-12-11)
 
 
