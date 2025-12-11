@@ -7,12 +7,6 @@ GitHub Actions for setting up [Amber] compiler.
 
 This action downloads and installs the Amber compiler binary, making it available for subsequent steps in your workflow.
 
-> [!NOTE]
-> This is a [composite action] because I want less maintaining costs.
-> There is a limitation of composite action itself:
->
-> - Name of steps are not displayed. ([GitHub discussion](https://github.com/orgs/community/discussions/10985))
-
 ## Usage
 
 See [action.yaml](action.yaml)
