@@ -1,9 +1,3 @@
-__test__/_temp
-_temp/
-lib/
-node_modules/
-
 # misc
 .DS_Store
 *.pem
-.vscode/

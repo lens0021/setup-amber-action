@@ -1,0 +1,162 @@
+import { array_contains } from "std/array"
+import { env_var_get, has_failed } from "std/env"
+import { dir_create, file_exists, file_extract, temp_dir_create } from "std/fs"
+import { file_download } from "std/http"
+import { split, parse_int } from "std/text"
+
+/// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
+fun get_os(): Text {
+  const os_type = $ uname -s $ failed {
+      echo "Failed to determine OS type (using `uname` command)."
+      exit 1
+  }
+  if os_type == "Darwin":
+      return "macos"
+
+  if os_type != "Linux" {
+      echo "Unsupported OS type: {os_type}"
+      exit 1
+  }
+
+  if not has_failed("ls -l /lib | grep libc.musl"):
+      return "linux-musl"
+
+  return "linux-gnu"
+}
+
+/// original: https://github.com/amber-lang/amber/blob/0.5.0-alpha/setup/shared.ab
+fun get_arch(): Text {
+  let arch_type = $ uname -m $ failed {
+    echo "Failed to determine architecture."
+    exit 1
+  }
+
+  let arch = array_contains(["arm64", "aarch64"], arch_type)
+    then "aarch64"
+    else "x86_64"
+
+  return arch
+}
+
+/// Check if version is less than 0.5.0
+fun is_version_lt_0_5_0(ver: Text): Bool {
+  // Remove -alpha, -beta, etc. suffix
+  const version_parts = split(ver, "-")
+  const version_numbers = split(version_parts[0], ".")
+
+  // Parse major, minor, patch
+  const major = parse_int(version_numbers[0]) failed { return false }
+  const minor = len(version_numbers) > 1
+    then parse_int(version_numbers[1]) failed { return false }
+    else 0
+
+  // Compare with 0.5.0
+  if {
+    major < 0 {
+      return true
+    }
+    major > 0 {
+      return false
+    }
+    else {
+      return minor < 5
+    }
+  }
+}
+
+/// Check if URL exists using curl with retry logic
+fun check_url_exists(url: Text): Bool {
+  const max_retries = 3
+  const retry_delay_seconds = 1
+
+  for attempt in 1..max_retries+1 {
+    silent $ curl --head --fail --silent --location "{url}" $ exited(code) {
+      if code == 0 {
+        return true
+      }
+    }
+
+    if attempt < max_retries {
+      echo "::debug::Attempt {attempt}/{max_retries} failed, retrying in {retry_delay_seconds}s..."
+      trust $ sleep {retry_delay_seconds} $
+    }
+  }
+
+  echo "::debug::Failed to check URL after {max_retries} attempts"
+  return false
+}
+
+const cache_path = trust env_var_get("SETUP_AMBER_CACHE_PATH")
+const bin_path = trust env_var_get("SETUP_AMBER_BIN_PATH")
+if file_exists("{cache_path}/bin/amber") {
+  echo "::debug::Using cached amber binary"
+  $ install "{cache_path}/bin/amber" "{bin_path}" $ failed(code) {
+    echo "Failed to locate binary file to {bin_path} with code {code}."
+    exit 1
+  }
+} else {
+  const ver = trust env_var_get("SETUP_AMBER_VERSION")
+  echo "::debug::Downloading amber {ver}"
+  trust dir_create("{cache_path}/bin")
+
+  const os = get_os()
+  const arch = get_arch()
+
+  // Determine filename based on version
+  let filename = "amber"
+  let binary_in_subdir = false
+  if is_version_lt_0_5_0(ver) {
+    // < 0.5.0: amber-{arch}-{target}.tar.xz
+    // - amber-aarch64-apple-darwin.tar.xz
+    // - amber-aarch64-unknown-linux-gnu.tar.xz
+    // - amber-x86_64-apple-darwin.tar.xz
+    // - amber-x86_64-unknown-linux-gnu.tar.xz
+    // - amber-x86_64-unknown-linux-musl.tar.xz
+    filename += "-{arch}"
+    if os == "linux-gnu" or os == "linux-musl":
+      filename += "-unknown-{os}"
+    else:
+      filename += "-apple-darwin"
+    binary_in_subdir = true
+  } else {
+    // >= 0.5.0: amber-{os}-{arch}.tar.xz
+    // - amber-linux-gnu-aarch64.tar.xz
+    // - amber-linux-gnu-x86_64.tar.xz
+    // - amber-linux-musl-aarch64.tar.xz
+    // - amber-linux-musl-x86_64.tar.xz
+    // - amber-macos-aarch64.tar.xz
+    // - amber-macos-x86_64.tar.xz
+    filename += "-{os}-{arch}"
+    binary_in_subdir = false
+  }
+
+  const url = "https://github.com/amber-lang/amber/releases/download/{ver}/{filename}.tar.xz"
+
+  // Check if URL exists before downloading
+  if not check_url_exists(url) {
+    echo "Error: Release file not found at {url}"
+    echo "Please check if version {ver} exists and is available for your platform ({os}, {arch})."
+    exit 1
+  }
+
+  echo "::debug::Downloading from {url}"
+  const temp_dir = trust temp_dir_create("tmp.XXXXXXXXXX", true, true)
+  trust file_download(url, "{temp_dir}/amber.tar.xz")
+  trust file_extract("{temp_dir}/amber.tar.xz", temp_dir)
+
+  // Install binary based on directory structure
+  const binary_source = binary_in_subdir
+    then "{temp_dir}/{filename}/amber"
+    else "{temp_dir}/amber"
+
+  echo "::debug::Installing binary from {binary_source}"
+  $ cp "{binary_source}" "{cache_path}/bin" $ failed(code) {
+    echo "Failed to copy binary file to {cache_path}/bin with code {code}."
+  }
+  $ install "{binary_source}" "{bin_path}" $ failed(code) {
+    echo "Failed to install binary file to {bin_path} with code {code}."
+    exit 1
+  }
+  echo "::debug::Successfully installed amber {ver} to {bin_path}"
+}
+

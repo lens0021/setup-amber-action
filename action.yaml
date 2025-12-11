@@ -21,6 +21,41 @@ inputs:
       Default to `/usr/local/bin/amber`.
     default: /usr/local/bin/amber
 runs:
-  using: node24
-  main: dist/index.js
-  post: dist/index.js
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        INPUT_CACHE_PATH: ${{ inputs.cache-path }}
+        RUNNER_OS: ${{ runner.os }}
+      run: |
+        # Export cache path
+        # using delimiter syntax to prevent injection
+        delimiter="ghadelimiter_$(openssl rand -hex 16)"
+
+        if [ -n "$INPUT_CACHE_PATH" ]; then
+          cache_path="$INPUT_CACHE_PATH"
+        elif [ "$RUNNER_OS" == "Linux" ]; then
+          cache_path="/home/runner/.setup-amber"
+        else
+          cache_path="/Users/runner/.setup-amber"
+        fi
+
+        {
+          echo "amber_cache_path<<$delimiter"
+          echo "$cache_path"
+          echo "$delimiter"
+        } >> "$GITHUB_ENV"
+    - name: Cache Amber binaries
+      uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      if: inputs.enable-cache
+      with:
+        path: ${{ env.amber_cache_path }}/bin
+        key: setup-amber-${{ runner.os }}-${{ runner.arch }}-${{ inputs.amber-version }}
+    - shell: bash
+      env:
+        SETUP_AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
+        SETUP_AMBER_BIN_PATH: ${{ inputs.bin-path }}
+        SETUP_AMBER_VERSION: ${{ inputs.amber-version }}
+      run: |
+        # Download Amber binary
+        bash "${{ github.action_path }}/dist/main.sh"
