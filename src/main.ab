@@ -64,11 +64,26 @@ fun is_version_lt_0_5_0(ver: Text): Bool {
   }
 }
 
-/// Check if URL exists using curl
+/// Check if URL exists using curl with retry logic
 fun check_url_exists(url: Text): Bool {
-  silent $ curl --head --fail --silent "{url}" $ exited(code) {
-    return code == 0
+  const max_retries = 3
+  const retry_delay_seconds = 1
+
+  loop attempt in 1..max_retries+1 {
+    silent $ curl --head --fail --silent "{url}" $ exited(code) {
+      if code == 0 {
+        return true
+      }
+    }
+
+    if attempt < max_retries {
+      echo "::debug::Attempt {attempt}/{max_retries} failed, retrying in {retry_delay_seconds}s..."
+      $ sleep {retry_delay_seconds} $
+    }
   }
+
+  echo "::debug::Failed to check URL after {max_retries} attempts"
+  return false
 }
 
 const cache_path = trust env_var_get("SETUP_AMBER_CACHE_PATH")
