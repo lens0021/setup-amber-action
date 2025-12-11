@@ -53,16 +53,39 @@ function isVersionLt(ver: string, compareTo: string): boolean {
 	return false;
 }
 
-async function checkUrlExists(url: string): Promise<boolean> {
-	const http = new HttpClient("setup-amber");
-	try {
-		const response = await http.head(url);
-		return response.message.statusCode === 200;
-	} catch (_error) {
-		return false;
-	} finally {
-		http.dispose();
+async function checkUrlExists(
+	url: string,
+	maxRetries = 3,
+	retryDelay = 1000,
+): Promise<boolean> {
+	for (let attempt = 1; attempt <= maxRetries; attempt++) {
+		const http = new HttpClient("setup-amber", undefined, {
+			allowRedirects: true,
+			maxRedirects: 5,
+		});
+		try {
+			const response = await http.head(url);
+			const statusCode = response.message.statusCode;
+			// Accept both 200 (OK) and 302/301 (redirect) as valid
+			if (statusCode === 200 || statusCode === 302 || statusCode === 301) {
+				return true;
+			}
+		} catch (error) {
+			if (attempt === maxRetries) {
+				core.debug(
+					`Failed to check URL after ${maxRetries} attempts: ${error}`,
+				);
+				return false;
+			}
+			core.debug(
+				`Attempt ${attempt}/${maxRetries} failed, retrying in ${retryDelay}ms...`,
+			);
+			await new Promise((resolve) => setTimeout(resolve, retryDelay));
+		} finally {
+			http.dispose();
+		}
 	}
+	return false;
 }
 
 async function run(): Promise<void> {

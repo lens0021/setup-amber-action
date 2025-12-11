@@ -98,19 +98,34 @@ function isVersionLt(ver, compareTo) {
     }
     return false;
 }
-function checkUrlExists(url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const http = new http_client_1.HttpClient("setup-amber");
-        try {
-            const response = yield http.head(url);
-            return response.message.statusCode === 200;
+function checkUrlExists(url_1) {
+    return __awaiter(this, arguments, void 0, function* (url, maxRetries = 3, retryDelay = 1000) {
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            const http = new http_client_1.HttpClient("setup-amber", undefined, {
+                allowRedirects: true,
+                maxRedirects: 5,
+            });
+            try {
+                const response = yield http.head(url);
+                const statusCode = response.message.statusCode;
+                // Accept both 200 (OK) and 302/301 (redirect) as valid
+                if (statusCode === 200 || statusCode === 302 || statusCode === 301) {
+                    return true;
+                }
+            }
+            catch (error) {
+                if (attempt === maxRetries) {
+                    core.debug(`Failed to check URL after ${maxRetries} attempts: ${error}`);
+                    return false;
+                }
+                core.debug(`Attempt ${attempt}/${maxRetries} failed, retrying in ${retryDelay}ms...`);
+                yield new Promise((resolve) => setTimeout(resolve, retryDelay));
+            }
+            finally {
+                http.dispose();
+            }
         }
-        catch (_error) {
-            return false;
-        }
-        finally {
-            http.dispose();
-        }
+        return false;
     });
 }
 function run() {
