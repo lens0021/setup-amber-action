@@ -28,12 +28,12 @@ array_contains__2_v0() {
 # We cannot import `bash_version` from `env.ab` because it imports `text.ab` making a circular dependency.
 # This is a workaround to avoid that issue and the import system should be improved in the future.
 bash_version__11_v0() {
-    major_28="$(echo "${BASH_VERSINFO[0]}")"
-    minor_29="$(echo "${BASH_VERSINFO[1]}")"
+    major_31="$(echo "${BASH_VERSINFO[0]}")"
+    minor_32="$(echo "${BASH_VERSINFO[1]}")"
     command_2="$(echo "${BASH_VERSINFO[2]}")"
     __status=$?
-    patch_30="${command_2}"
-    ret_bash_version11_v0=("${major_28}" "${minor_29}" "${patch_30}")
+    patch_33="${command_2}"
+    ret_bash_version11_v0=("${major_31}" "${minor_32}" "${patch_33}")
     return 0
 }
 
@@ -42,7 +42,7 @@ replace__12_v0() {
     local search=$2
     local replace=$3
     # Here we use a command to avoid #646
-    result_27=""
+    result_30=""
     bash_version__11_v0 
     left_comp=("${ret_bash_version11_v0[@]}")
     right_comp=(4 3)
@@ -63,13 +63,13 @@ replace__12_v0() {
         (( "${#left_comp[@]}" == "${#right_comp[@]}" || "${#left_comp[@]}" > "${#right_comp[@]}" )) && echo 1 || echo 0
 )"
     if [ "${comp}" != 0 ]; then
-        result_27="${source//"${search}"/"${replace}"}"
+        result_30="${source//"${search}"/"${replace}"}"
         __status=$?
     else
-        result_27="${source//"${search}"/${replace}}"
+        result_30="${source//"${search}"/${replace}}"
         __status=$?
     fi
-    ret_replace12_v0="${result_27}"
+    ret_replace12_v0="${result_30}"
     return 0
 }
 
@@ -148,11 +148,11 @@ match_regex__31_v0() {
     local search=$2
     local extended=$3
     sed_version__14_v0 
-    sed_version_26="${ret_sed_version14_v0}"
+    sed_version_29="${ret_sed_version14_v0}"
     replace__12_v0 "${search}" "/" "\\/"
     search="${ret_replace12_v0}"
-    output_31=""
-    if [ "$(( $(( ${sed_version_26} == ${__SED_VERSION_GNU_1} )) || $(( ${sed_version_26} == ${__SED_VERSION_BUSYBOX_2} )) ))" != 0 ]; then
+    output_34=""
+    if [ "$(( $(( ${sed_version_29} == ${__SED_VERSION_GNU_1} )) || $(( ${sed_version_29} == ${__SED_VERSION_BUSYBOX_2} )) ))" != 0 ]; then
         # '\b' is supported but not in POSIX standards. Disable it
         replace__12_v0 "${search}" "\\b" "\\\\b"
         search="${ret_replace12_v0}"
@@ -160,29 +160,29 @@ match_regex__31_v0() {
     if [ "${extended}" != 0 ]; then
         # GNU sed versions 4.0 through 4.2 support extended regex syntax,
         # but only via the "-r" option
-        if [ "$(( ${sed_version_26} == ${__SED_VERSION_GNU_1} ))" != 0 ]; then
+        if [ "$(( ${sed_version_29} == ${__SED_VERSION_GNU_1} ))" != 0 ]; then
             # '\b' is not in POSIX standards. Disable it
             replace__12_v0 "${search}" "\\b" "\\b"
             search="${ret_replace12_v0}"
             command_8="$(echo "${source}" | sed -r -ne "/${search}/p")"
             __status=$?
-            output_31="${command_8}"
+            output_34="${command_8}"
         else
             command_9="$(echo "${source}" | sed -E -ne "/${search}/p")"
             __status=$?
-            output_31="${command_9}"
+            output_34="${command_9}"
         fi
     else
-        if [ "$(( $(( ${sed_version_26} == ${__SED_VERSION_GNU_1} )) || $(( ${sed_version_26} == ${__SED_VERSION_BUSYBOX_2} )) ))" != 0 ]; then
+        if [ "$(( $(( ${sed_version_29} == ${__SED_VERSION_GNU_1} )) || $(( ${sed_version_29} == ${__SED_VERSION_BUSYBOX_2} )) ))" != 0 ]; then
             # GNU Sed BRE handle \| as a metacharacter, but it is not POSIX standands. Disable it
             replace__12_v0 "${search}" "\\|" "|"
             search="${ret_replace12_v0}"
         fi
         command_10="$(echo "${source}" | sed -ne "/${search}/p")"
         __status=$?
-        output_31="${command_10}"
+        output_34="${command_10}"
     fi
-    if [ "$([ "_${output_31}" == "_" ]; echo $?)" != 0 ]; then
+    if [ "$([ "_${output_34}" == "_" ]; echo $?)" != 0 ]; then
         ret_match_regex31_v0=1
         return 0
     fi
@@ -243,7 +243,7 @@ temp_dir_create__55_v0() {
         ret_temp_dir_create55_v0=''
         return 1
     fi
-    filename_24=""
+    filename_27=""
     is_mac_os_mktemp__54_v0 
     ret_is_mac_os_mktemp54_v0__119_8="${ret_is_mac_os_mktemp54_v0}"
     if [ "${ret_is_mac_os_mktemp54_v0__119_8}" != 0 ]; then
@@ -255,7 +255,7 @@ temp_dir_create__55_v0() {
             ret_temp_dir_create55_v0=''
             return "${__status}"
         fi
-        filename_24="${command_11}"
+        filename_27="${command_11}"
     else
         command_12="$(mktemp -d -p "$TMPDIR" -t "${template}")"
         __status=$?
@@ -263,29 +263,29 @@ temp_dir_create__55_v0() {
             ret_temp_dir_create55_v0=''
             return "${__status}"
         fi
-        filename_24="${command_12}"
+        filename_27="${command_12}"
     fi
-    if [ "$([ "_${filename_24}" != "_" ]; echo $?)" != 0 ]; then
+    if [ "$([ "_${filename_27}" != "_" ]; echo $?)" != 0 ]; then
         echo "Failed to make a temporary directory"
         ret_temp_dir_create55_v0=''
         return 1
     fi
     if [ "${auto_delete}" != 0 ]; then
         if [ "${force_delete}" != 0 ]; then
-            trap 'rm -rf '"${filename_24}"'' EXIT
+            trap 'rm -rf '"${filename_27}"'' EXIT
             __status=$?
             if [ "${__status}" != 0 ]; then
-                echo "Setting auto deletion fails. You must delete temporary dir ${filename_24}."
+                echo "Setting auto deletion fails. You must delete temporary dir ${filename_27}."
             fi
         else
-            trap 'rmdir '"${filename_24}"'' EXIT
+            trap 'rmdir '"${filename_27}"'' EXIT
             __status=$?
             if [ "${__status}" != 0 ]; then
-                echo "Setting auto deletion fails. You must delete temporary dir ${filename_24}."
+                echo "Setting auto deletion fails. You must delete temporary dir ${filename_27}."
             fi
         fi
     fi
-    ret_temp_dir_create55_v0="${filename_24}"
+    ret_temp_dir_create55_v0="${filename_27}"
     return 0
 }
 
@@ -552,11 +552,27 @@ is_version_lt_0_5_0__166_v0() {
 
 check_url_exists__167_v0() {
     local url=$1
-    curl --head --fail --silent "${url}" >/dev/null 2>&1
-    __status=$?
-    code_23="${__status}"
-        ret_check_url_exists167_v0="$(( ${code_23} == 0 ))"
-        return 0
+    max_retries_23=3
+    retry_delay_seconds_24=1
+    from=1
+    to="$(( ${max_retries_23} + 1 ))"
+    for attempt_25 in $(if [ "${from}" -gt "${to}" ]; then seq -- "${from}" -1 "$(( ${to} + 1 ))"; elif [ "${from}" -lt "${to}" ]; then seq -- "${from}" "$(( ${to} - 1 ))"; fi); do
+        curl --head --fail --silent "${url}" >/dev/null 2>&1
+        __status=$?
+        code_26="${__status}"
+            if [ "$(( ${code_26} == 0 ))" != 0 ]; then
+                ret_check_url_exists167_v0=1
+                return 0
+            fi
+        if [ "$(( ${attempt_25} < ${max_retries_23} ))" != 0 ]; then
+            echo "::debug::Attempt ${attempt_25}/${max_retries_23} failed, retrying in ${retry_delay_seconds_24}s..."
+            sleep ${retry_delay_seconds_24}
+            __status=$?
+        fi
+    done
+    echo "::debug::Failed to check URL after ${max_retries_23} attempts"
+    ret_check_url_exists167_v0=0
+    return 0
 }
 
 env_var_get__109_v0 "SETUP_AMBER_CACHE_PATH"
@@ -566,8 +582,8 @@ env_var_get__109_v0 "SETUP_AMBER_BIN_PATH"
 __status=$?
 bin_path_4="${ret_env_var_get109_v0}"
 file_exists__48_v0 "${cache_path_3}/bin/amber"
-ret_file_exists48_v0__76_4="${ret_file_exists48_v0}"
-if [ "${ret_file_exists48_v0__76_4}" != 0 ]; then
+ret_file_exists48_v0__91_4="${ret_file_exists48_v0}"
+if [ "${ret_file_exists48_v0__91_4}" != 0 ]; then
     echo "::debug::Using cached amber binary"
     install "${cache_path_3}/bin/amber" "${bin_path_4}"
     __status=$?
@@ -591,8 +607,8 @@ else
     filename_15="amber"
     binary_in_subdir_16=0
     is_version_lt_0_5_0__166_v0 "${ver_6}"
-    ret_is_version_lt_0_5_0166_v0__93_6="${ret_is_version_lt_0_5_0166_v0}"
-    if [ "${ret_is_version_lt_0_5_0166_v0__93_6}" != 0 ]; then
+    ret_is_version_lt_0_5_0166_v0__108_6="${ret_is_version_lt_0_5_0166_v0}"
+    if [ "${ret_is_version_lt_0_5_0166_v0__108_6}" != 0 ]; then
         # < 0.5.0: amber-{arch}-{target}.tar.xz
         # - amber-aarch64-apple-darwin.tar.xz
         # - amber-aarch64-unknown-linux-gnu.tar.xz
@@ -620,8 +636,8 @@ else
     url_22="https://github.com/amber-lang/amber/releases/download/${ver_6}/${filename_15}.tar.xz"
     # Check if URL exists before downloading
     check_url_exists__167_v0 "${url_22}"
-    ret_check_url_exists167_v0__121_10="${ret_check_url_exists167_v0}"
-    if [ "$(( ! ${ret_check_url_exists167_v0__121_10} ))" != 0 ]; then
+    ret_check_url_exists167_v0__136_10="${ret_check_url_exists167_v0}"
+    if [ "$(( ! ${ret_check_url_exists167_v0__136_10} ))" != 0 ]; then
         echo "Error: Release file not found at ${url_22}"
         echo "Please check if version ${ver_6} exists and is available for your platform (${os_8}, ${arch_14})."
         exit 1
@@ -629,25 +645,25 @@ else
     echo "::debug::Downloading from ${url_22}"
     temp_dir_create__55_v0 "tmp.XXXXXXXXXX" 1 1
     __status=$?
-    temp_dir_25="${ret_temp_dir_create55_v0}"
-    file_download__160_v0 "${url_22}" "${temp_dir_25}/amber.tar.xz"
+    temp_dir_28="${ret_temp_dir_create55_v0}"
+    file_download__160_v0 "${url_22}" "${temp_dir_28}/amber.tar.xz"
     __status=$?
-    file_extract__61_v0 "${temp_dir_25}/amber.tar.xz" "${temp_dir_25}"
+    file_extract__61_v0 "${temp_dir_28}/amber.tar.xz" "${temp_dir_28}"
     __status=$?
     # Install binary based on directory structure
-    binary_source_32="$(if [ "${binary_in_subdir_16}" != 0 ]; then echo "${temp_dir_25}/${filename_15}/amber"; else echo "${temp_dir_25}/amber"; fi)"
-    echo "::debug::Installing binary from ${binary_source_32}"
-    cp "${binary_source_32}" "${cache_path_3}/bin"
+    binary_source_35="$(if [ "${binary_in_subdir_16}" != 0 ]; then echo "${temp_dir_28}/${filename_15}/amber"; else echo "${temp_dir_28}/amber"; fi)"
+    echo "::debug::Installing binary from ${binary_source_35}"
+    cp "${binary_source_35}" "${cache_path_3}/bin"
     __status=$?
     if [ "${__status}" != 0 ]; then
-    code_33="${__status}"
-        echo "Failed to copy binary file to ${cache_path_3}/bin with code ${code_33}."
+    code_36="${__status}"
+        echo "Failed to copy binary file to ${cache_path_3}/bin with code ${code_36}."
     fi
-    install "${binary_source_32}" "${bin_path_4}"
+    install "${binary_source_35}" "${bin_path_4}"
     __status=$?
     if [ "${__status}" != 0 ]; then
-    code_34="${__status}"
-        echo "Failed to install binary file to ${bin_path_4} with code ${code_34}."
+    code_37="${__status}"
+        echo "Failed to install binary file to ${bin_path_4} with code ${code_37}."
         exit 1
     fi
     echo "::debug::Successfully installed amber ${ver_6} to ${bin_path_4}"

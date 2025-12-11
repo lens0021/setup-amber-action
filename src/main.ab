@@ -69,7 +69,7 @@ fun check_url_exists(url: Text): Bool {
   const max_retries = 3
   const retry_delay_seconds = 1
 
-  loop attempt in 1..max_retries+1 {
+  for attempt in 1..max_retries+1 {
     silent $ curl --head --fail --silent "{url}" $ exited(code) {
       if code == 0 {
         return true
@@ -78,7 +78,7 @@ fun check_url_exists(url: Text): Bool {
 
     if attempt < max_retries {
       echo "::debug::Attempt {attempt}/{max_retries} failed, retrying in {retry_delay_seconds}s..."
-      $ sleep {retry_delay_seconds} $
+      trust $ sleep {retry_delay_seconds} $
     }
   }
 
