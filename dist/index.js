@@ -58,19 +58,20 @@ const node_child_process_1 = __nccwpck_require__(1421);
 const http_client_1 = __nccwpck_require__(4844);
 function getOs() {
     const platform = os.platform();
-    if (platform === "darwin") {
-        return "macos";
-    }
-    if (platform !== "linux") {
-        throw new Error(`Unsupported OS type: ${platform}`);
-    }
-    try {
-        (0, node_child_process_1.execSync)("ls -l /lib | grep libc.musl", { stdio: "pipe" });
-        return "linux-musl";
-    }
-    catch (_error) {
-        // command failed, so not musl
-        return "linux-gnu";
+    switch (platform) {
+        case "darwin":
+            return "macos";
+        case "linux":
+            try {
+                (0, node_child_process_1.execSync)("ls -l /lib | grep libc.musl", { stdio: "pipe" });
+                return "linux-musl";
+            }
+            catch (_error) {
+                // command failed, so not musl
+                return "linux-gnu";
+            }
+        default:
+            throw new Error(`Unsupported OS type: ${platform}`);
     }
 }
 function getArch() {
@@ -115,7 +116,7 @@ function checkUrlExists(url) {
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const amberVersion = core.getInput("amber-version", { required: true });
+            const amberVersion = core.getInput("amber-version");
             const binPath = core.getInput("bin-path") || path.join(os.homedir(), ".local", "bin");
             const enableCache = core.getBooleanInput("enable-cache");
             let amberPath = "";

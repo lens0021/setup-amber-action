@@ -1,26 +1,26 @@
-import * as core from "@actions/core";
-import * as tc from "@actions/tool-cache";
-import * as io from "@actions/io";
+import { execSync } from "node:child_process";
 import * as os from "node:os";
 import * as path from "node:path";
-import { execSync } from "node:child_process";
+import * as core from "@actions/core";
 import { HttpClient } from "@actions/http-client";
+import * as io from "@actions/io";
+import * as tc from "@actions/tool-cache";
 
 function getOs(): string {
 	const platform = os.platform();
-	if (platform === "darwin") {
-		return "macos";
-	}
-	if (platform !== "linux") {
-		throw new Error(`Unsupported OS type: ${platform}`);
-	}
-
-	try {
-		execSync("ls -l /lib | grep libc.musl", { stdio: "pipe" });
-		return "linux-musl";
-	} catch (_error) {
-		// command failed, so not musl
-		return "linux-gnu";
+	switch (platform) {
+		case "darwin":
+			return "macos";
+		case "linux":
+			try {
+				execSync("ls -l /lib | grep libc.musl", { stdio: "pipe" });
+				return "linux-musl";
+			} catch (_error) {
+				// command failed, so not musl
+				return "linux-gnu";
+			}
+		default:
+			throw new Error(`Unsupported OS type: ${platform}`);
 	}
 }
 
@@ -67,7 +67,7 @@ async function checkUrlExists(url: string): Promise<boolean> {
 
 async function run(): Promise<void> {
 	try {
-		const amberVersion = core.getInput("amber-version", { required: true });
+		const amberVersion = core.getInput("amber-version");
 		const binPath =
 			core.getInput("bin-path") || path.join(os.homedir(), ".local", "bin");
 		const enableCache = core.getBooleanInput("enable-cache");

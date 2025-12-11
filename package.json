@@ -5,9 +5,8 @@
 	"main": "lib/main.js",
 	"scripts": {
 		"build": "tsc && ncc build",
-		"format": "biome format --write '**/*.ts'",
-		"check": "biome check '**/*.ts'",
-		"lint": "biome lint src/**/*.ts",
+		"lint": "biome check .",
+		"fix": "biome check --write .",
 		"test": "jest"
 	},
 	"repository": {
