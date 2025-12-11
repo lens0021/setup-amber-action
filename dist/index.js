@@ -49,13 +49,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core = __importStar(__nccwpck_require__(7484));
-const tc = __importStar(__nccwpck_require__(3472));
-const io = __importStar(__nccwpck_require__(4994));
+const node_child_process_1 = __nccwpck_require__(1421);
 const os = __importStar(__nccwpck_require__(8161));
 const path = __importStar(__nccwpck_require__(6760));
-const node_child_process_1 = __nccwpck_require__(1421);
+const core = __importStar(__nccwpck_require__(7484));
 const http_client_1 = __nccwpck_require__(4844);
+const io = __importStar(__nccwpck_require__(4994));
+const tc = __importStar(__nccwpck_require__(3472));
 function getOs() {
     const platform = os.platform();
     switch (platform) {
