@@ -2,8 +2,7 @@
 name: Test
 on:
   - push
-permissions:
-  contents: read
+permissions: {}
 jobs:
   test-default:
     name: Test with default settings
