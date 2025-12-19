@@ -36,6 +36,10 @@ See [action.yaml](action.yaml)
     # Default (Linux): '/home/runner/.setup-amber'
     # Default (Mac): '/Users/runner/.setup-amber'
     cache-path: ""
+
+    # The path where the Amber binary should be installed.
+    # Default: /usr/local/bin/amber
+    bin-path: ""
 ```
 
 <!-- end usage -->
