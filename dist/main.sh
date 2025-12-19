@@ -581,11 +581,11 @@ cache_path_3="${ret_env_var_get109_v0}"
 env_var_get__109_v0 "SETUP_AMBER_BIN_PATH"
 __status=$?
 bin_path_4="${ret_env_var_get109_v0}"
-file_exists__48_v0 "${cache_path_3}/bin/amber"
+file_exists__48_v0 "${cache_path_3}/amber"
 ret_file_exists48_v0__91_4="${ret_file_exists48_v0}"
 if [ "${ret_file_exists48_v0__91_4}" != 0 ]; then
     echo "::debug::Using cached amber binary"
-    install "${cache_path_3}/bin/amber" "${bin_path_4}"
+    install "${cache_path_3}/amber" "${bin_path_4}"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_5="${__status}"
@@ -597,7 +597,7 @@ else
     __status=$?
     ver_6="${ret_env_var_get109_v0}"
     echo "::debug::Downloading amber ${ver_6}"
-    dir_create__53_v0 "${cache_path_3}/bin"
+    dir_create__53_v0 "${cache_path_3}"
     __status=$?
     get_os__164_v0 
     os_8="${ret_get_os164_v0}"
@@ -653,11 +653,11 @@ else
     # Install binary based on directory structure
     binary_source_35="$(if [ "${binary_in_subdir_16}" != 0 ]; then echo "${temp_dir_28}/${filename_15}/amber"; else echo "${temp_dir_28}/amber"; fi)"
     echo "::debug::Installing binary from ${binary_source_35}"
-    cp "${binary_source_35}" "${cache_path_3}/bin"
+    cp "${binary_source_35}" "${cache_path_3}/amber"
     __status=$?
     if [ "${__status}" != 0 ]; then
     code_36="${__status}"
-        echo "Failed to copy binary file to ${cache_path_3}/bin with code ${code_36}."
+        echo "Failed to copy binary file to ${cache_path_3}/amber with code ${code_36}."
     fi
     install "${binary_source_35}" "${bin_path_4}"
     __status=$?
