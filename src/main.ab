@@ -88,16 +88,16 @@ fun check_url_exists(url: Text): Bool {
 
 const cache_path = trust env_var_get("SETUP_AMBER_CACHE_PATH")
 const bin_path = trust env_var_get("SETUP_AMBER_BIN_PATH")
-if file_exists("{cache_path}/bin/amber") {
+if file_exists("{cache_path}/amber") {
   echo "::debug::Using cached amber binary"
-  $ install "{cache_path}/bin/amber" "{bin_path}" $ failed(code) {
+  $ install "{cache_path}/amber" "{bin_path}" $ failed(code) {
     echo "Failed to locate binary file to {bin_path} with code {code}."
     exit 1
   }
 } else {
   const ver = trust env_var_get("SETUP_AMBER_VERSION")
   echo "::debug::Downloading amber {ver}"
-  trust dir_create("{cache_path}/bin")
+  trust dir_create("{cache_path}")
 
   const os = get_os()
   const arch = get_arch()
@@ -150,8 +150,8 @@ if file_exists("{cache_path}/bin/amber") {
     else "{temp_dir}/amber"
 
   echo "::debug::Installing binary from {binary_source}"
-  $ cp "{binary_source}" "{cache_path}/bin" $ failed(code) {
-    echo "Failed to copy binary file to {cache_path}/bin with code {code}."
+  $ cp "{binary_source}" "{cache_path}/amber" $ failed(code) {
+    echo "Failed to copy binary file to {cache_path}/amber with code {code}."
   }
   $ install "{binary_source}" "{bin_path}" $ failed(code) {
     echo "Failed to install binary file to {bin_path} with code {code}."
