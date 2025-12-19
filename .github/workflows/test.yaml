@@ -87,3 +87,28 @@ jobs:
           bin-path: ./
 
       - run: ./amber --version
+
+  test-output:
+    name: Test amber-path output
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+
+      - id: setup
+        uses: ./
+        with:
+          amber-version: 0.5.1-alpha
+
+      - run: |
+          echo "Amber path output: ${{ steps.setup.outputs.amber-path }}"
+          if [ -z "${{ steps.setup.outputs.amber-path }}" ]; then
+            echo "Error: amber-path output is empty"
+            exit 1
+          fi
+          if [ ! -x "${{ steps.setup.outputs.amber-path }}" ]; then
+            echo "Error: amber-path does not point to an executable file"
+            exit 1
+          fi
+          echo "amber-path output is valid"
