@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/lens0021/setup-amber-action/compare/v2.1.0...v2.2.0) (2025-12-19)
+
+
+### Features
+
+* Add amber-path output ([#48](https://github.com/lens0021/setup-amber-action/issues/48)) ([0c6af87](https://github.com/lens0021/setup-amber-action/commit/0c6af871761b5fe1126e0c55b64adddc4ef65844))
+
 ## [2.1.0](https://github.com/lens0021/setup-amber-action/compare/v2.0.0...v2.1.0) (2025-12-11)
 
 
