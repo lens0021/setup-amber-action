@@ -20,6 +20,10 @@ inputs:
       The path to location where the final amber binary should be located.
       Default to `/usr/local/bin/amber`.
     default: /usr/local/bin/amber
+outputs:
+  amber-path:
+    description: The path where the Amber binary was installed.
+    value: ${{ steps.set-output.outputs.amber-path }}
 runs:
   using: composite
   steps:
@@ -40,7 +44,8 @@ runs:
       with:
         path: ${{ env.amber_cache_path }}/amber
         key: setup-amber-${{ runner.os }}-${{ runner.arch }}-${{ inputs.amber-version }}
-    - shell: bash
+    - id: set-output
+      shell: bash
       env:
         SETUP_AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
         SETUP_AMBER_BIN_PATH: ${{ inputs.bin-path }}

@@ -668,3 +668,9 @@ else
     fi
     echo "::debug::Successfully installed amber ${ver_6} to ${bin_path_4}"
 fi
+echo "amber-path=${bin_path_4}" >> "$GITHUB_OUTPUT"
+__status=$?
+if [ "${__status}" != 0 ]; then
+code_38="${__status}"
+    echo "::warning::Failed to set amber-path output with code ${code_38}."
+fi

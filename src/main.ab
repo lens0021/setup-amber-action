@@ -160,3 +160,6 @@ if file_exists("{cache_path}/amber") {
   echo "::debug::Successfully installed amber {ver} to {bin_path}"
 }
 
+$ echo "amber-path={bin_path}" >> "\$GITHUB_OUTPUT" $ failed(code) {
+  echo "::warning::Failed to set amber-path output with code {code}."
+}
