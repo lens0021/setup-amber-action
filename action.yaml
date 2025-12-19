@@ -26,20 +26,9 @@ runs:
     - shell: bash
       env:
         INPUT_CACHE_PATH: ${{ inputs.cache-path }}
-        RUNNER_OS: ${{ runner.os }}
       run: |
-        # Export cache path
-        # using delimiter syntax to prevent injection
         delimiter="ghadelimiter_$(openssl rand -hex 16)"
-
-        if [ -n "$INPUT_CACHE_PATH" ]; then
-          cache_path="$INPUT_CACHE_PATH"
-        elif [ "$RUNNER_OS" == "Linux" ]; then
-          cache_path="/home/runner/.tools"
-        else
-          cache_path="/Users/runner/.tools"
-        fi
-
+        cache_path="${INPUT_CACHE_PATH:-$HOME/.tools}"
         {
           echo "amber_cache_path<<$delimiter"
           echo "$cache_path"
