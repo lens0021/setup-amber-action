@@ -23,7 +23,7 @@ inputs:
 outputs:
   amber-path:
     description: The path where the Amber binary was installed.
-    value: ${{ steps.set-output.outputs.amber-path }}
+    value: ${{ steps.main.outputs.amber-path }}
 runs:
   using: composite
   steps:
@@ -45,7 +45,7 @@ runs:
       with:
         path: ${{ env.amber_cache_path }}/amber
         key: setup-amber-${{ runner.os }}-${{ runner.arch }}-${{ inputs.amber-version }}
-    - id: set-output
+    - id: main
       shell: bash
       env:
         SETUP_AMBER_CACHE_PATH: ${{ env.amber_cache_path }}
