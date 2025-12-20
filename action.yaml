@@ -31,6 +31,7 @@ runs:
       env:
         INPUT_CACHE_PATH: ${{ inputs.cache-path }}
       run: |
+        # Handle user-given cache-path
         delimiter="ghadelimiter_$(openssl rand -hex 16)"
         cache_path="${INPUT_CACHE_PATH:-$HOME/.tools}"
         {
