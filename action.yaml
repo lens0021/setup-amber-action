@@ -30,6 +30,7 @@ runs:
     - shell: bash
       env:
         INPUT_CACHE_PATH: ${{ inputs.cache-path }}
+      id: cache-path
       run: |
         # Handle user-given cache-path
         delimiter="ghadelimiter_$(openssl rand -hex 16)"
@@ -38,12 +39,12 @@ runs:
           echo "amber_cache_path<<$delimiter"
           echo "$cache_path"
           echo "$delimiter"
-        } >> "$GITHUB_ENV"
+        } >> "$GITHUB_OUTPUT"
     - name: Cache Amber binaries
       uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
       if: inputs.enable-cache
       with:
-        path: ${{ env.amber_cache_path }}/amber
+        path: ${{ steps.cache-path.outputs.amber_cache_path }}/amber
         key: setup-amber-${{ runner.os }}-${{ runner.arch }}-${{ inputs.amber-version }}
     - id: main
       shell: bash
