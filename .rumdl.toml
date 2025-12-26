@@ -1,0 +1,4 @@
+[global]
+line-length = 100
+disable = ["MD013"]
+exclude = ["CHANGELOG.md"]
