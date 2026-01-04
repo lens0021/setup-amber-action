@@ -18,7 +18,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Amber
-        uses: lens0021/setup-amber@014375f0b64132ead405709f11653f95c6aa1652 # v2.0.0
+        uses: lens0021/setup-amber@58394844f9bb51e8b559f224b03f6dcb3d79f644 # v2.2.0
         with:
           amber-version: 0.5.1-alpha
 
