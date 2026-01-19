@@ -36,7 +36,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: biomejs/setup-biome@29711cbb52afee00eb13aeb30636592f9edc0088 # v2.6.0 Latest
+      - uses: biomejs/setup-biome@29711cbb52afee00eb13aeb30636592f9edc0088 # v2.7.0
       - run: biome ci
 
   rumdl:
