@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/lens0021/setup-amber-action/compare/v2.2.0...v2.2.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* Avoid exposing an internal environment variable ([#55](https://github.com/lens0021/setup-amber-action/issues/55)) ([385b135](https://github.com/lens0021/setup-amber-action/commit/385b135a8646e1bf684d6b6e209ea0bdc8f99740))
+
 ## [2.2.0](https://github.com/lens0021/setup-amber-action/compare/v2.1.0...v2.2.0) (2025-12-19)
 
 
